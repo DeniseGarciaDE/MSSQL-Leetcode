@@ -1,45 +1,25 @@
---Rising Temperatures
+--Creating Weather table
+CREATE TABLE Weather (
+    id INT PRIMARY KEY,
+    recordDate date, 
+    temperature INT
+);
 
-Table: Weather
+--Inserting values 
+INSERT INTO Weather (id, recordDate, temperature)
+VALUES (1, '2015-01-01', 10),
+       (2, '2015-01-02', 25),
+       (3, '2015-01-03', 20),
+       (4, '2015-01-04', 30);
 
-+---------------+---------+
-| Column Name   | Type    |
-+---------------+---------+
-| id            | int     |
-| recordDate    | date    |
-| temperature   | int     |
-+---------------+---------+
-id is the primary key for this table.
-This table contains information about the temperature on a certain day.
- 
+--Solution
+SELECT w.id 
+FROM
+    (SELECT id, 
+            temperature AS CurrentTemp, 
+            LAG(temperature, 1) OVER (ORDER BY recordDate ASC) AS PriorTemp,
+            recordDate AS CurrentDate,
+            LAG(recordDate, 1) OVER (ORDER BY recordDate ASC) AS PriorDate
+    FROM Weather ) AS w
+WHERE (w.CurrentTemp > w.PriorTemp) AND (DATEDIFF(DAY, w.PriorDate, w.CurrentDate) = 1)
 
-Write an SQL query to find all dates Id with higher temperatures compared to its previous dates (yesterday).
-
-Return the result table in any order.
-
-The query result format is in the following example.
-
- 
-
-Example 1:
-
-Input: 
-Weather table:
-+----+------------+-------------+
-| id | recordDate | temperature |
-+----+------------+-------------+
-| 1  | 2015-01-01 | 10          |
-| 2  | 2015-01-02 | 25          |
-| 3  | 2015-01-03 | 20          |
-| 4  | 2015-01-04 | 30          |
-+----+------------+-------------+
-Output: 
-+----+
-| id |
-+----+
-| 2  |
-| 4  |
-+----+
-Explanation: 
-In 2015-01-02, the temperature was higher than the previous day (10 -> 25).
-In 2015-01-04, the temperature was higher than the previous day (20 -> 30).
